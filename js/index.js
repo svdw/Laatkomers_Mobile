@@ -88,7 +88,7 @@ var app = {
                 $.ajax({
                     type: "POST",
                     contentType: "application/json; charset=utf-8",
-                    url: "../Services/LaatkomerService.asmx/AddTeLaatKomer",
+                    url: "http://llnmobile.vtir.be/Services/LaatkomerService.asmx/AddTeLaatKomer",
                     data: data,
                     dataType: "json",
                     success: function (data) {
