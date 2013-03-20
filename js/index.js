@@ -18,31 +18,31 @@
 */
 var app = {
     // Application Constructor
-    initialize: function() {
+    initialize: function () {
         this.bindEvents();
-		
-		/*test notifications */
-		//var self = this;
-		//self.showAlert('Test notification', 'Info');
-		//$('.search-key').on('keyup', $.proxy(this.findByName, this));
+
+        /*test notifications */
+        //var self = this;
+        //self.showAlert('Test notification', 'Info');
+        //$('.search-key').on('keyup', $.proxy(this.findByName, this));
     },
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
     // `load`, `deviceready`, `offline`, and `online`.
-    bindEvents: function() {
+    bindEvents: function () {
         document.addEventListener('deviceready', this.onDeviceReady, false);
-        document.getElementById('scan').addEventListener('click', this.scan, false);
+        document.getElementById('scanbtn').addEventListener('click', this.scantest, false);
     },
     // deviceready Event Handler
     //
     // The scope of `this` is the event. In order to call the `receivedEvent`
     // function, we must explicity call `app.receivedEvent(...);`
-    onDeviceReady: function() {
+    onDeviceReady: function () {
         app.receivedEvent('deviceready');
     },
     // Update DOM on a Received Event
-    receivedEvent: function(id) {
+    receivedEvent: function (id) {
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');
@@ -52,63 +52,85 @@ var app = {
 
         console.log('Received Event: ' + id);
     },
-    scan: function() {
-        console.log('scanning');
-        try {
-            window.plugins.barcodeScanner.scan(function(args) {
-                /*
-				console.log("Scanner result: \n" +
-                    "text: " + args.text + "\n" +
-                    "format: " + args.format + "\n" +
-                    "cancelled: " + args.cancelled + "\n");
-				*/
-                /*
-				if (args.format == "QR_CODE") {
-				window.plugins.childBrowser.showWebPage(args.text, { showLocationBar: false });
-				}
-				*/
-                var currentdate = new Date();
+    scantest: function () {
+        var currentdate = new Date();
 
-                var datetime = "Last Sync: " + currentdate.getDate() + "/"
-                + (currentdate.getMonth()+1)  + "/" 
-                + currentdate.getFullYear() + " @ "  
-                + currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
+        var datetime = currentdate.getDate() + "/"
+                + (currentdate.getMonth() + 1) + "/"
+                + currentdate.getFullYear() + " "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
                 + currentdate.getSeconds();
 
-                checkDate_Time(datetime);
+        var data = {
+            wisaId: JSON.stringify($("#scanvalue").val()),
+            datetime: JSON.stringify(datetime)
+        };
+
+        $.ajax({
+            url: "http://llnmobile.vtir.be/services/LaatkomerService.asmx/AddTeLaatKomer",
+            data: data,
+            dataType: "jsonp",
+            success: function (json) {
+                $("#info").html("Barcode gelezen: " + $("#scanvalue").val());
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.responseText);
+            }
+        });
+    },
+    scan: function () {
+        console.log('scanning');
+        try {
+            window.plugins.barcodeScanner.scan(function (args) {
+                /*
+                console.log("Scanner result: \n" +
+                "text: " + args.text + "\n" +
+                "format: " + args.format + "\n" +
+                "cancelled: " + args.cancelled + "\n");
+                */
+                /*
+                if (args.format == "QR_CODE") {
+                window.plugins.childBrowser.showWebPage(args.text, { showLocationBar: false });
+                }
+                */
+                var currentdate = new Date();
+
+                var datetime = currentdate.getDate() + "/"
+                + (currentdate.getMonth() + 1) + "/"
+                + currentdate.getFullYear() + " "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
 
                 var data = {
-                    wisaId: args.text,
-                    datetime: datetime
+                    wisaId: JSON.stringify(args.text),
+                    datetime: JSON.stringify(datetime)
                 };
 
-                data = JSON.stringify(data);
-
+                $("#info").html("Verwerken...");
                 $.ajax({
-                    type: "POST",
-                    contentType: "application/json; charset=utf-8",
-                    url: "http://llnmobile.vtir.be/Services/LaatkomerService.asmx/AddTeLaatKomer",
+                    url: "http://llnmobile.vtir.be/services/LaatkomerService.asmx/AddTeLaatKomer",
                     data: data,
-                    dataType: "json",
-                    success: function (data) {
-                        document.getElementById("info").innerHTML = "Barcode gelezen: " + args.text;
+                    dataType: "jsonp",
+                    success: function (json) {
+                        $("#info").html("Barcode gelezen: " + args.text);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert(xhr.responseText);
                     }
                 });
                 //console.log(args);
-        });
+            });
         } catch (ex) {
             console.log(ex.message);
         }
     },
-    checkDate_Time: function (time) {
-        return (time < 10) ? ("0" + time) : time;   
-    },
-	showAlert: function (message, title) {
-		if (navigator.notification) {
-			navigator.notification.alert(message, null, title, 'OK');
-		} else {
-			alert(title ? (title + ": " + message) : message);
-		}
-	}
+    showAlert: function (message, title) {
+        if (navigator.notification) {
+            navigator.notification.alert(message, null, title, 'OK');
+        } else {
+            alert(title ? (title + ": " + message) : message);
+        }
+    }
 };

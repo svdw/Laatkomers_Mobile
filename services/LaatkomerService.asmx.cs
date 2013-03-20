@@ -4,16 +4,13 @@ using System.Linq;
 using System.Web;
 using System.Web.Services;
 using VtiLeerlingenData;
+using System.Web.Script.Services;
 
 namespace Laatkomers_Mobile.Services
 {
     /// <summary>
     /// Summary description for LaatkomerService
     /// </summary>
-    [WebService(Namespace = "http://tempuri.org/")]
-    [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
-    [System.ComponentModel.ToolboxItem(false)]
-    // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
     [System.Web.Script.Services.ScriptService]
     public class LaatkomerService : System.Web.Services.WebService
     {
@@ -40,7 +37,8 @@ namespace Laatkomers_Mobile.Services
         }
 
         [WebMethod]
-        public void AddTeLaatKomer(string wisaId, string datetime)
+        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
+        public string AddTeLaatKomer(string wisaId, string datetime)
         {
             HelpFunctions func = new HelpFunctions();
             LeerlingenDataContext context = new LeerlingenDataContext();
@@ -56,8 +54,8 @@ namespace Laatkomers_Mobile.Services
                 // 2) Voeg record toe in de TeLaat tabel
                 TeLaat telaat = new TeLaat
                 {
-                    Leerling1 = lln,
-                    Schooljaar1 = oSchooljaar,
+                    Leerling = lln.ID,
+                    Schooljaar = oSchooljaar.ID,
                     Goedgekeurd = false,
                     Reden = "",
                     Datum = datum
@@ -65,6 +63,12 @@ namespace Laatkomers_Mobile.Services
 
                 context.TeLaats.InsertOnSubmit(telaat);
                 context.SubmitChanges();
+
+                return "OK";
+            }
+            else
+            {
+                throw new Exception("Leerling niet gevonden");
             }
         }
     }

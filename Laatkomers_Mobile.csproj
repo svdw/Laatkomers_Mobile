@@ -12,7 +12,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Laatkomers_Mobile</RootNamespace>
     <AssemblyName>Laatkomers_Mobile</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,33 +33,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
-    <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="config.xml" />
+    <Content Include="config.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="css\index.css" />
     <Content Include="index.html" />
     <Content Include="js\index.js" />
     <Content Include="js\json2.js" />
     <Content Include="lib\handlebars.js" />
     <Content Include="services\LaatkomerService.asmx" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -74,6 +76,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Visual Studio 2008\Projects\VtiLeerlingen\ContentTypeHttpModule\ContentTypeHttpModule.csproj">
+      <Project>{25513451-62CA-4B9C-9983-429B8EAF49EB}</Project>
+      <Name>ContentTypeHttpModule</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Visual Studio 2008\Projects\VtiLeerlingen\VtiLeerlingenData\VtiLeerlingenData.csproj">
       <Project>{DCC5AF9E-FC44-4BC5-95DE-CA2ED5FE4681}</Project>
       <Name>VtiLeerlingenData</Name>

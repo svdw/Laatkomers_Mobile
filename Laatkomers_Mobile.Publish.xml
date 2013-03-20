@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<publishData>
+  <publishProfile publishUrl="FTP://217.21.179.206/Leerlingen_Mobile" deleteExistingFiles="False" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="False" profileName="Profile1" publishMethod="FTP" replaceMatchingFiles="True" userName="stijn.vandewalle" savePWD="True" userPWD="AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAxqghokqpU2pYOYW/WbRhgAAAAACAAAAAAADZgAAqAAAABAAAADAhSyduae2MOSAwlyzd22iAAAAAASAAACgAAAAEAAAAGXurQ9lWz14DDL4yCPPC2oYAAAA0OqMDonCndzPpEm/3PSMdIFaS4aLInTPFAAAAJnxauFJcpRMMvYMZ1nAzGak8tVb" SelectedForPublish="True">
+    <file relUrl="Web.config" publishTime="03/20/2013 11:33:16" />
+    <file relUrl="js/json2.js" publishTime="03/20/2013 09:20:51" />
+    <file relUrl="lib/handlebars.js" publishTime="03/20/2013 09:13:51" />
+    <file relUrl="bin/Laatkomers_Mobile.pdb" publishTime="03/20/2013 11:40:32" />
+    <file relUrl="bin/ContentTypeHttpModule.dll" publishTime="03/20/2013 11:40:32" />
+    <file relUrl="bin/Laatkomers_Mobile.dll" publishTime="03/20/2013 11:40:32" />
+    <file relUrl="config.xml" publishTime="03/20/2013 10:46:28" />
+    <file relUrl="bin/VtiLeerlingenData.pdb" publishTime="01/29/2013 15:43:15" />
+    <file relUrl="services/LaatkomerService.asmx" publishTime="03/20/2013 09:02:29" />
+    <file relUrl="bin/ContentTypeHttpModule.pdb" publishTime="03/20/2013 11:40:32" />
+    <file relUrl="bin/VtiLeerlingenData.dll" publishTime="01/29/2013 15:43:15" />
+    <file relUrl="css/index.css" publishTime="03/20/2013 09:13:31" />
+    <file relUrl="index.html" publishTime="03/20/2013 10:40:27" />
+    <file relUrl="js/index.js" publishTime="03/20/2013 11:35:23" />
+  </publishProfile>
+</publishData>
