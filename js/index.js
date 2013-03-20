@@ -101,6 +101,9 @@ var app = {
             console.log(ex.message);
         }
     },
+    checkDate_Time: function (time) {
+        return (time < 10) ? ("0" + time) : time;   
+    },
 	showAlert: function (message, title) {
 		if (navigator.notification) {
 			navigator.notification.alert(message, null, title, 'OK');
@@ -108,10 +111,4 @@ var app = {
 			alert(title ? (title + ": " + message) : message);
 		}
 	}
-
-
-
-    function checkDate_Time(time){
-        return (time < 10) ? ("0" + time) : time;   
-    }
 };
