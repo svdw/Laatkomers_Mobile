@@ -18,14 +18,154 @@
 */
 var app = {
     // Application Constructor
-    initialize: function () {
+    initialize: function (callback) {
+        var self = this;
         this.bindEvents();
+
+        //Open local db
+        this.db = window.openDatabase("laatkomersdb", "1.0", "Laatkomers DB", 200000);
+
+        //Create table on inti
+        this.db.transaction(
+            function (tx) {
+                //Find the corresponding table in the database
+                tx.executeSql("SELECT name FROM sqlite_master WHERE type='table' AND name='laatkomers'", this.txErrorHandler,
+                    function (tx, results) {
+                        if (results.rows.length == 1) {
+                            log('Using existing Employee table in local SQLite database');
+                            //Loop through records to check with row needs to be synchronize
+                            self.selectChanges();
+                        }
+                        else {
+                            log('Employee table does not exist in local SQLite database');
+                            self.createTable(callback);
+                        }
+                    });
+            }
+        )
 
         /*test notifications */
         //var self = this;
         //self.showAlert('Test notification', 'Info');
         //$('.search-key').on('keyup', $.proxy(this.findByName, this));
     },
+
+    createTable: function (callback) {
+        this.db.transaction(
+            function (tx) {
+                var sql =
+                    "CREATE TABLE IF NOT EXISTS laatkomers ( " +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "wisaid VARCHAR(50), " +
+                    "datum VARCHAR(50))";
+                tx.executeSql(sql);
+            },
+            this.txErrorHandler,
+            function () {
+                log('Table laatkomers successfully CREATED in local SQLite database');
+                callback();
+            }
+        );
+    },
+
+    selectChanges: function (callback) {
+        this.db.transaction(
+            function (tx) {
+                var sql = "SELECT * FROM laatkomers";
+                log('Local SQLite database: "SELECT * FROM laatkomers"');
+                tx.executeSql(sql, this.txErrorHandler,
+                    function (tx, results) {
+                        var laatkomers = [];
+                        var len = results.rows.length;
+                        for (var i = 0; i < len; i = i + 1) {
+                            laatkomers[i] = results.rows.item(i);
+                            log(results.rows.item(i).wisaid + '\r\n');
+                        }
+                        $("#info").html('');
+                        log(len + ' rows found');
+                        app.addLaatkomerToWs(laatkomers);
+                        app.deleteRows(laatkomers);
+                        callback(laatkomers);
+                    }
+                );
+            }
+        );
+    },
+
+    deleteRows: function (laatkomers, callback) {
+        //De data werd niet opgeslagen bv: geen internet connectie => opslaan in localdb
+        this.db.transaction(
+            function (tx) {
+                var l = laatkomers.length;
+                var e;
+                for (var i = 0; i < l; i++) {
+                    e = laatkomers[i];
+                    var sql = "DELETE FROM laatkomers WHERE id = ?";
+                    log('Deleting row ' + e.id + ' in local database:');
+                    var params = [e.id];
+                    tx.executeSql(sql, params);
+                }
+            },
+            this.txErrorHandler,
+            function (tx) {
+                callback();
+            }
+        );
+    },
+
+    addLaatkomerToWs: function (laatkomers, callback) {
+        var l = laatkomers.length;
+        var e;
+        for (var i = 0; i < l; i++) {
+            e = laatkomers[i];
+            log('Add ' + e.wisaid + ' to laatkomers webservice');
+            var data = {
+                wisaId: JSON.stringify(e.wisaid),
+                datetime: JSON.stringify(e.datum)
+            };
+
+            $.ajax({
+                url: "http://llnmobile.vtir.be/services/LaatkomerService.asmx/AddTeLaatKomer",
+                data: data,
+                dataType: "jsonp",
+                success: function (json) {
+                    callback();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+    },
+
+    insertLaatkomer: function (wisaid, datum, callback) {
+        log('insertLaatkomer');
+        //De data werd niet opgeslagen bv: geen internet connectie => opslaan in localdb
+        this.db.transaction(
+            function (tx) {
+                //var l = employees.length;
+                var l = 1;
+                var sql =
+                    "INSERT INTO laatkomers (wisaid, datum) " +
+                    "VALUES (?, ?)";
+                log('Inserting or Updating in local database:');
+                var e;
+                for (var i = 0; i < l; i++) {
+                    log(wisaid + ' ' + datum);
+
+                    var params = [wisaid, datum];
+
+                    tx.executeSql(sql, params);
+                }
+                log('Insert complete (' + l + ' items synchronized)');
+            },
+            this.txErrorHandler,
+            function (tx) {
+                callback();
+            }
+        );
+    },
+
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
@@ -33,6 +173,7 @@ var app = {
     bindEvents: function () {
         document.addEventListener('deviceready', this.onDeviceReady, false);
         document.getElementById('scan').addEventListener('click', this.scan, false);
+        //document.getElementById('scanbtn').addEventListener('click', this.scantest, false);
     },
     // deviceready Event Handler
     //
@@ -52,7 +193,7 @@ var app = {
 
         console.log('Received Event: ' + id);
     },
-    scantest: function () {
+    scantest: function (callback) {
         var currentdate = new Date();
 
         var datetime = currentdate.getDate() + "/"
@@ -75,7 +216,7 @@ var app = {
                 $("#info").html("Barcode gelezen: " + $("#scanvalue").val());
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr.responseText);
+                app.insertLaatkomer($("#scanvalue").val(), datetime);
             }
         });
     },
@@ -104,23 +245,21 @@ var app = {
                 + currentdate.getSeconds();
 
                 var data = {
-                    wisaId: JSON.stringify(args.text),
+                    wisaId: JSON.stringify($("#scanvalue").val()),
                     datetime: JSON.stringify(datetime)
                 };
 
-                $("#info").html("Verwerken...");
                 $.ajax({
                     url: "http://llnmobile.vtir.be/services/LaatkomerService.asmx/AddTeLaatKomer",
                     data: data,
                     dataType: "jsonp",
                     success: function (json) {
-                        $("#info").html("Barcode gelezen: " + args.text);
+                        $("#info").html("Barcode gelezen: " + $("#scanvalue").val());
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.responseText);
+                        app.insertLaatkomer($("#scanvalue").val(), datetime);
                     }
                 });
-                //console.log(args);
             });
         } catch (ex) {
             console.log(ex.message);
@@ -134,3 +273,7 @@ var app = {
         }
     }
 };
+
+function log(msg) {
+    //$('#log').val($('#log').val() + msg + '\n');
+}
